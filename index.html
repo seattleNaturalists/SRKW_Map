@@ -447,11 +447,10 @@
                 last.style.display = "none";
             }
         });
-var overlaysTree = [
-    {label: 'Cities', layer: layer_Cities_2},
-    {label: '<b>SRKW Sightings...</b>', layer: layer_SRKWSightings19992022_1},
-    {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0}
-]
+        var overlaysTree = [
+            {label: '<img src="legend/Cities_2.png" /> Cities', layer: layer_Cities_2},
+            {label: 'SRKW Sightings (1999-2022)<br /><table><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_00.png" /></td><td>0</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_1501.png" /></td><td>1 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_512002.png" /></td><td>51 - 200</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_2015003.png" /></td><td>201 - 500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_50110004.png" /></td><td>501 - 1000</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_100125005.png" /></td><td>1001 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_250149646.png" /></td><td>2501 - 4964</td></tr></table>', layer: layer_SRKWSightings19992022_1},
+            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0, radioGroup: 'bm' },]
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
             //selectorBack: false,
@@ -459,59 +458,9 @@ var overlaysTree = [
             //openedSymbol: '&#8863; &#x1f5c1;',
             //collapseAll: 'Collapse all',
             //expandAll: 'Expand all',
-            collapsed: false, 
+            collapsed: true,
         });
         lay.addTo(map);
-		document.addEventListener("DOMContentLoaded", function() {
-            // set new Layers List height which considers toggle icon
-            function newLayersListHeight() {
-                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
-                if (layerScrollbarElement) {
-                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
-                    var originalHeight = layersListElement.style.height 
-                        || window.getComputedStyle(layersListElement).height;
-                    var newHeight = parseFloat(originalHeight) - 50;
-                    layersListElement.style.height = newHeight + 'px';
-                }
-            }
-            var isLayersListExpanded = true;
-            var controlLayersElement = document.querySelector('.leaflet-control-layers');
-            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
-            // toggle Collapsed/Expanded and apply new Layers List height
-            toggleLayerControl.addEventListener('click', function() {
-                if (isLayersListExpanded) {
-                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
-                } else {
-                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
-                }
-                isLayersListExpanded = !isLayersListExpanded;
-                newLayersListHeight()
-            });	
-			// apply new Layers List height if toggle layerstree
-			if (controlLayersElement) {
-				controlLayersElement.addEventListener('click', function(event) {
-					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
-					if (toggleLayerHeaderPointer) {
-						newLayersListHeight();
-					}
-				});
-			}
-            // Collapsed/Expanded at Start to apply new height
-            setTimeout(function() {
-                toggleLayerControl.click();
-            }, 10);
-            setTimeout(function() {
-                toggleLayerControl.click();
-            }, 10);
-            // Collapsed touch/small screen
-            var isSmallScreen = window.innerWidth < 650;
-            if (isSmallScreen) {
-                setTimeout(function() {
-                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
-                    isLayersListExpanded = !isLayersListExpanded;
-                }, 500);
-            }  
-        });       
         setBounds();
         var i = 0;
         layer_Cities_2.eachLayer(function(layer) {
