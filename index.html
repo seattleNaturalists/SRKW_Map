@@ -450,7 +450,7 @@
         var overlaysTree = [
             {label: '<img src="legend/Cities_2.png" /> Cities', layer: layer_Cities_2},
             {label: 'SRKW Sightings (1999-2022)<br /><table><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_00.png" /></td><td>0</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_1501.png" /></td><td>1 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_512002.png" /></td><td>51 - 200</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_2015003.png" /></td><td>201 - 500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_50110004.png" /></td><td>501 - 1000</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_100125005.png" /></td><td>1001 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_250149646.png" /></td><td>2501 - 4964</td></tr></table>', layer: layer_SRKWSightings19992022_1},
-            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0},]
+            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0, radioGroup: 'bm' },]
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
             //selectorBack: false,
