@@ -8,9 +8,11 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <link rel="stylesheet" href="css/leaflet.css">
         <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
         html, body, #map {
             width: 100%;
@@ -27,6 +29,7 @@
         <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
         <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
         <script src="js/leaflet.rotatedMarker.js"></script>
         <script src="js/leaflet.pattern.js"></script>
         <script src="js/leaflet-hash.js"></script>
@@ -35,13 +38,20 @@
         <script src="js/labelgun.min.js"></script>
         <script src="js/labels.js"></script>
         <script src="js/leaflet.photon.js"></script>
-        <script src="data/Tidepooling_Seattle_2025_1.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/SRKWSightings19992022_1.js"></script>
+        <script src="data/Cities_2.js"></script>
         <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+            highlightLayer.openPopup();
+        }
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[47.45756983475272,-122.70565902724597],[47.73793755771051,-122.01540776950587]]);
+        })
         var hash = new L.Hash(map);
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        map.attributionControl.setPrefix('<a href="https://github.com/qgis2web/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
         // remove popup's row if "visible-with-data"
         function removeEmptyRowsFromPopupContent(content, feature) {
@@ -107,55 +117,103 @@
         var zoomControl = L.control.zoom({
             position: 'topleft'
         }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
         var bounds_group = new L.featureGroup([]);
         function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
         }
-        map.createPane('pane_GoogleTerrain_0');
-        map.getPane('pane_GoogleTerrain_0').style.zIndex = 400;
-        var layer_GoogleTerrain_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
-            pane: 'pane_GoogleTerrain_0',
+        map.createPane('pane_ESRIGraylight_0');
+        map.getPane('pane_ESRIGraylight_0').style.zIndex = 400;
+        var layer_ESRIGraylight_0 = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_ESRIGraylight_0',
             opacity: 1.0,
-            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            attribution: '',
             minZoom: 1,
             maxZoom: 28,
             minNativeZoom: 0,
             maxNativeZoom: 20
         });
-        layer_GoogleTerrain_0;
-        map.addLayer(layer_GoogleTerrain_0);
-        function pop_Tidepooling_Seattle_2025_1(feature, layer) {
+        layer_ESRIGraylight_0;
+        map.addLayer(layer_ESRIGraylight_0);
+        function pop_SRKWSightings19992022_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">Address</th>\
-                        <td class="visible-with-data" id="Address">' + (feature.properties['Address'] !== null ? autolinker.link(String(feature.properties['Address']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(String(feature.properties['OBJECTID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">City</th>\
-                        <td class="visible-with-data" id="City">' + (feature.properties['City'] !== null ? autolinker.link(String(feature.properties['City']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['Quad'] !== null ? autolinker.link(String(feature.properties['Quad']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Subregion</th>\
-                        <td class="visible-with-data" id="Subregion">' + (feature.properties['Subregion'] !== null ? autolinker.link(String(feature.properties['Subregion']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['Fish_Area'] !== null ? autolinker.link(String(feature.properties['Fish_Area']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">X</th>\
-                        <td class="visible-with-data" id="X">' + (feature.properties['X'] !== null ? autolinker.link(String(feature.properties['X']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['JAN'] !== null ? autolinker.link(String(feature.properties['JAN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Y</th>\
-                        <td class="visible-with-data" id="Y">' + (feature.properties['Y'] !== null ? autolinker.link(String(feature.properties['Y']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['FEB'] !== null ? autolinker.link(String(feature.properties['FEB']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">IN_SingleL</th>\
-                        <td class="visible-with-data" id="IN_SingleL">' + (feature.properties['IN_SingleL'] !== null ? autolinker.link(String(feature.properties['IN_SingleL']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['MAR'] !== null ? autolinker.link(String(feature.properties['MAR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Place Name</th>\
-                        <td class="visible-with-data" id="Place Name">' + (feature.properties['Place Name'] !== null ? autolinker.link(String(feature.properties['Place Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['APR'] !== null ? autolinker.link(String(feature.properties['APR']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">USER_Notes</th>\
-                        <td class="visible-with-data" id="USER_Notes">' + (feature.properties['USER_Notes'] !== null ? autolinker.link(String(feature.properties['USER_Notes']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['MAY'] !== null ? autolinker.link(String(feature.properties['MAY']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['JUN'] !== null ? autolinker.link(String(feature.properties['JUN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['JUL'] !== null ? autolinker.link(String(feature.properties['JUL']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AUG'] !== null ? autolinker.link(String(feature.properties['AUG']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SEP'] !== null ? autolinker.link(String(feature.properties['SEP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OCT'] !== null ? autolinker.link(String(feature.properties['OCT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOV'] !== null ? autolinker.link(String(feature.properties['NOV']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DEC'] !== null ? autolinker.link(String(feature.properties['DEC']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TOTAL'] !== null ? autolinker.link(String(feature.properties['TOTAL']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape__Are'] !== null ? autolinker.link(String(feature.properties['Shape__Are']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape__Len'] !== null ? autolinker.link(String(feature.properties['Shape__Len']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -165,41 +223,261 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 
-        function style_Tidepooling_Seattle_2025_1_0() {
+        function style_SRKWSightings19992022_1_0(feature) {
+            if (feature.properties['TOTAL'] >= 0.000000 && feature.properties['TOTAL'] <= 1.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                stroke: false, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,0.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 1.000000 && feature.properties['TOTAL'] <= 50.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(37,217,253,0.765)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 50.000000 && feature.properties['TOTAL'] <= 200.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(36,156,180,0.765)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 200.000000 && feature.properties['TOTAL'] <= 500.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(165,139,189,0.765)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 500.000000 && feature.properties['TOTAL'] <= 1000.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,211,245,0.765)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 1000.000000 && feature.properties['TOTAL'] <= 2500.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,149,232,0.765)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['TOTAL'] >= 2500.000000 && feature.properties['TOTAL'] <= 4964.000000 ) {
+                return {
+                pane: 'pane_SRKWSightings19992022_1',
+                opacity: 1,
+                color: 'rgba(113,113,113,0.765)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,81,217,0.765)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_SRKWSightings19992022_1');
+        map.getPane('pane_SRKWSightings19992022_1').style.zIndex = 401;
+        map.getPane('pane_SRKWSightings19992022_1').style['mix-blend-mode'] = 'normal';
+        var layer_SRKWSightings19992022_1 = new L.geoJson(json_SRKWSightings19992022_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_SRKWSightings19992022_1',
+            layerName: 'layer_SRKWSightings19992022_1',
+            pane: 'pane_SRKWSightings19992022_1',
+            onEachFeature: pop_SRKWSightings19992022_1,
+            style: style_SRKWSightings19992022_1_0,
+        });
+        bounds_group.addLayer(layer_SRKWSightings19992022_1);
+        map.addLayer(layer_SRKWSightings19992022_1);
+        function pop_Cities_2(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    if (typeof layer.closePopup == 'function') {
+                        layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['OBJECTID'] !== null ? autolinker.link(String(feature.properties['OBJECTID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NAME'] !== null ? autolinker.link(String(feature.properties['NAME']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CountySeat'] !== null ? autolinker.link(String(feature.properties['CountySeat']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GNIS'] !== null ? autolinker.link(String(feature.properties['GNIS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LastUpdate'] !== null ? autolinker.link(String(feature.properties['LastUpdate']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MajorCity'] !== null ? autolinker.link(String(feature.properties['MajorCity']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CountyFIPS'] !== null ? autolinker.link(String(feature.properties['CountyFIPS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CityFIPS'] !== null ? autolinker.link(String(feature.properties['CityFIPS']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cities_2_0() {
             return {
-                pane: 'pane_Tidepooling_Seattle_2025_1',
-        rotationAngle: 0.0,
-        rotationOrigin: 'center center',
-        icon: L.icon({
-            iconUrl: 'markers/Tidepooling_Seattle_2025_1.svg',
-            iconSize: [57.0, 57.0]
-        }),
+                pane: 'pane_Cities_2',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
                 interactive: true,
             }
         }
-        map.createPane('pane_Tidepooling_Seattle_2025_1');
-        map.getPane('pane_Tidepooling_Seattle_2025_1').style.zIndex = 401;
-        map.getPane('pane_Tidepooling_Seattle_2025_1').style['mix-blend-mode'] = 'normal';
-        var layer_Tidepooling_Seattle_2025_1 = new L.geoJson(json_Tidepooling_Seattle_2025_1, {
+        map.createPane('pane_Cities_2');
+        map.getPane('pane_Cities_2').style.zIndex = 402;
+        map.getPane('pane_Cities_2').style['mix-blend-mode'] = 'normal';
+        var layer_Cities_2 = new L.geoJson(json_Cities_2, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_Tidepooling_Seattle_2025_1',
-            layerName: 'layer_Tidepooling_Seattle_2025_1',
-            pane: 'pane_Tidepooling_Seattle_2025_1',
-            onEachFeature: pop_Tidepooling_Seattle_2025_1,
+            dataVar: 'json_Cities_2',
+            layerName: 'layer_Cities_2',
+            pane: 'pane_Cities_2',
+            onEachFeature: pop_Cities_2,
             pointToLayer: function (feature, latlng) {
                 var context = {
                     feature: feature,
                     variables: {}
                 };
-                return L.marker(latlng, style_Tidepooling_Seattle_2025_1_0(feature));
+                return L.circleMarker(latlng, style_Cities_2_0(feature));
             },
         });
-        bounds_group.addLayer(layer_Tidepooling_Seattle_2025_1);
-        map.addLayer(layer_Tidepooling_Seattle_2025_1);
+        bounds_group.addLayer(layer_Cities_2);
+        map.addLayer(layer_Cities_2);
+        const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
+        "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
+        var photonControl = L.control.photon({
+            url: url["Nominatim OSM"],
+            feedbackLabel: '',
+            position: 'topleft',
+            includePosition: true,
+            initial: true,
+            // resultsHandler: myHandler,
+        }).addTo(map);
+        photonControl._container.childNodes[0].style.borderRadius="10px"
+        // Create a variable to store the geoJSON data
+        var x = null;
+        // Create a variable to store the marker
+        var marker = null;
+        // Add an event listener to the Photon control to create a marker from the returned geoJSON data
+        var z = null;
+        photonControl.on('selected', function(e) {
+            console.log(photonControl.search.resultsContainer);
+            if (x != null) {
+                map.removeLayer(obj3.marker);
+                map.removeLayer(x);
+            }
+            obj2.gcd = e.choice;
+            x = L.geoJSON(obj2.gcd).addTo(map);
+            var label = typeof obj2.gcd.properties.label === 'undefined' ? obj2.gcd.properties.display_name : obj2.gcd.properties.label;
+            obj3.marker = L.marker(x.getLayers()[0].getLatLng()).bindPopup(label).addTo(map);
+            map.setView(x.getLayers()[0].getLatLng(), 17);
+            z = typeof e.choice.properties.label === 'undefined'? e.choice.properties.display_name : e.choice.properties.label;
+            console.log(e);
+            e.target.input.value = z;
+        });
+        var search = document.getElementsByClassName("leaflet-photon leaflet-control")[0];
+        search.classList.add("leaflet-control-search")
+        search.style.display = "flex";
+        search.style.backgroundColor="rgba(255,255,255,0.5)" 
+
+        // Create the new button element
+        var button = document.createElement("div");
+        button.id = "gcd-button-control";
+        button.className = "gcd-gl-btn fa fa-search search-button";
+
+        // Insert the button at the beginning of the search control
+        search.insertBefore(button, search.firstChild);
+        last = search.lastChild;
+        last.style.display = "none";
+        button.addEventListener("click", function (e) {
+            if (last.style.display === "none") {
+                last.style.display = "block";
+            } else {
+                last.style.display = "none";
+            }
+        });
         var overlaysTree = [
-            {label: '<img src="legend/Tidepooling_Seattle_2025_1.png" /> Tidepooling_Seattle_2025', layer: layer_Tidepooling_Seattle_2025_1},
-            {label: "Google Terrain", layer: layer_GoogleTerrain_0},]
+            {label: '<img src="legend/Cities_2.png" /> Cities', layer: layer_Cities_2},
+            {label: 'SRKW Sightings (1999-2022)<br /><table><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_00.png" /></td><td>0</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_1501.png" /></td><td>1 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_512002.png" /></td><td>51 - 200</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_2015003.png" /></td><td>201 - 500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_50110004.png" /></td><td>501 - 1000</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_100125005.png" /></td><td>1001 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_250149646.png" /></td><td>2501 - 4964</td></tr></table>', layer: layer_SRKWSightings19992022_1},
+            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0, radioGroup: 'bm' },]
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
             //selectorBack: false,
@@ -212,27 +490,27 @@
         lay.addTo(map);
         setBounds();
         var i = 0;
-        layer_Tidepooling_Seattle_2025_1.eachLayer(function(layer) {
+        layer_Cities_2.eachLayer(function(layer) {
             var context = {
                 feature: layer.feature,
                 variables: {}
             };
-            layer.bindTooltip((layer.feature.properties['Place Name'] !== null?String('<div style="color: #ffffff; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['Place Name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Tidepooling_Seattle_2025_1'});
+            layer.bindTooltip((layer.feature.properties['NAME'] !== null?String('<div style="color: #323232; font-size: 8pt; font-family: \'Georgia\', sans-serif;">' + layer.feature.properties['NAME']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Cities_2'});
             labels.push(layer);
             totalMarkers += 1;
               layer.added = true;
               addLabel(layer, i);
               i++;
         });
-        resetLabels([layer_Tidepooling_Seattle_2025_1]);
+        resetLabels([layer_Cities_2]);
         map.on("zoomend", function(){
-            resetLabels([layer_Tidepooling_Seattle_2025_1]);
+            resetLabels([layer_Cities_2]);
         });
         map.on("layeradd", function(){
-            resetLabels([layer_Tidepooling_Seattle_2025_1]);
+            resetLabels([layer_Cities_2]);
         });
         map.on("layerremove", function(){
-            resetLabels([layer_Tidepooling_Seattle_2025_1]);
+            resetLabels([layer_Cities_2]);
         });
         </script>        
     </body>
