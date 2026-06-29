@@ -11,7 +11,6 @@
         <link rel="stylesheet" href="css/L.Control.Locate.min.css">
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
-        <link rel="stylesheet" href="css/leaflet-search.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
         <link rel="stylesheet" href="css/leaflet-measure.css">
         <style>
@@ -40,9 +39,8 @@
         <script src="js/labels.js"></script>
         <script src="js/leaflet.photon.js"></script>
         <script src="js/leaflet-measure.js"></script>
-        <script src="js/leaflet-search.js"></script>
-        <script src="data/SRKWSightings19992022_0.js"></script>
-        <script src="data/Cities_1.js"></script>
+        <script src="data/SRKWSightings19992022_1.js"></script>
+        <script src="data/Cities_2.js"></script>
         <script>
         var highlightLayer;
         function highlightFeature(e) {
@@ -147,7 +145,20 @@
                 map.fitBounds(bounds_group.getBounds());
             }
         }
-        function pop_SRKWSightings19992022_0(feature, layer) {
+        map.createPane('pane_ESRIGraylight_0');
+        map.getPane('pane_ESRIGraylight_0').style.zIndex = 400;
+        var layer_ESRIGraylight_0 = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_ESRIGraylight_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_ESRIGraylight_0;
+        map.addLayer(layer_ESRIGraylight_0);
+        function pop_SRKWSightings19992022_1(feature, layer) {
             layer.on({
                 mouseout: function(e) {
                     for (var i in e.target._eventParents) {
@@ -180,10 +191,10 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 
-        function style_SRKWSightings19992022_0_0(feature) {
+        function style_SRKWSightings19992022_1_0(feature) {
             if (feature.properties['TOTAL'] >= 0.000000 && feature.properties['TOTAL'] <= 1.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 stroke: false, 
                 fill: true,
                 fillOpacity: 1,
@@ -193,7 +204,7 @@
             }
             if (feature.properties['TOTAL'] >= 1.000000 && feature.properties['TOTAL'] <= 50.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -208,7 +219,7 @@
             }
             if (feature.properties['TOTAL'] >= 50.000000 && feature.properties['TOTAL'] <= 200.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -223,7 +234,7 @@
             }
             if (feature.properties['TOTAL'] >= 200.000000 && feature.properties['TOTAL'] <= 500.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -238,7 +249,7 @@
             }
             if (feature.properties['TOTAL'] >= 500.000000 && feature.properties['TOTAL'] <= 1000.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -253,7 +264,7 @@
             }
             if (feature.properties['TOTAL'] >= 1000.000000 && feature.properties['TOTAL'] <= 2500.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -268,7 +279,7 @@
             }
             if (feature.properties['TOTAL'] >= 2500.000000 && feature.properties['TOTAL'] <= 4964.000000 ) {
                 return {
-                pane: 'pane_SRKWSightings19992022_0',
+                pane: 'pane_SRKWSightings19992022_1',
                 opacity: 1,
                 color: 'rgba(113,113,113,0.765)',
                 dashArray: '',
@@ -282,21 +293,21 @@
             }
             }
         }
-        map.createPane('pane_SRKWSightings19992022_0');
-        map.getPane('pane_SRKWSightings19992022_0').style.zIndex = 400;
-        map.getPane('pane_SRKWSightings19992022_0').style['mix-blend-mode'] = 'normal';
-        var layer_SRKWSightings19992022_0 = new L.geoJson(json_SRKWSightings19992022_0, {
+        map.createPane('pane_SRKWSightings19992022_1');
+        map.getPane('pane_SRKWSightings19992022_1').style.zIndex = 401;
+        map.getPane('pane_SRKWSightings19992022_1').style['mix-blend-mode'] = 'normal';
+        var layer_SRKWSightings19992022_1 = new L.geoJson(json_SRKWSightings19992022_1, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_SRKWSightings19992022_0',
-            layerName: 'layer_SRKWSightings19992022_0',
-            pane: 'pane_SRKWSightings19992022_0',
-            onEachFeature: pop_SRKWSightings19992022_0,
-            style: style_SRKWSightings19992022_0_0,
+            dataVar: 'json_SRKWSightings19992022_1',
+            layerName: 'layer_SRKWSightings19992022_1',
+            pane: 'pane_SRKWSightings19992022_1',
+            onEachFeature: pop_SRKWSightings19992022_1,
+            style: style_SRKWSightings19992022_1_0,
         });
-        bounds_group.addLayer(layer_SRKWSightings19992022_0);
-        map.addLayer(layer_SRKWSightings19992022_0);
-        function pop_Cities_1(feature, layer) {
+        bounds_group.addLayer(layer_SRKWSightings19992022_1);
+        map.addLayer(layer_SRKWSightings19992022_1);
+        function pop_Cities_2(feature, layer) {
             layer.on({
                 mouseout: function(e) {
                     for (var i in e.target._eventParents) {
@@ -347,9 +358,9 @@
 			layer.bindPopup(content, { maxHeight: 400 });
         }
 
-        function style_Cities_1_0() {
+        function style_Cities_2_0() {
             return {
-                pane: 'pane_Cities_1',
+                pane: 'pane_Cities_2',
                 radius: 4.0,
                 opacity: 1,
                 color: 'rgba(35,35,35,1.0)',
@@ -363,26 +374,26 @@
                 interactive: true,
             }
         }
-        map.createPane('pane_Cities_1');
-        map.getPane('pane_Cities_1').style.zIndex = 401;
-        map.getPane('pane_Cities_1').style['mix-blend-mode'] = 'normal';
-        var layer_Cities_1 = new L.geoJson(json_Cities_1, {
+        map.createPane('pane_Cities_2');
+        map.getPane('pane_Cities_2').style.zIndex = 402;
+        map.getPane('pane_Cities_2').style['mix-blend-mode'] = 'normal';
+        var layer_Cities_2 = new L.geoJson(json_Cities_2, {
             attribution: '',
             interactive: true,
-            dataVar: 'json_Cities_1',
-            layerName: 'layer_Cities_1',
-            pane: 'pane_Cities_1',
-            onEachFeature: pop_Cities_1,
+            dataVar: 'json_Cities_2',
+            layerName: 'layer_Cities_2',
+            pane: 'pane_Cities_2',
+            onEachFeature: pop_Cities_2,
             pointToLayer: function (feature, latlng) {
                 var context = {
                     feature: feature,
                     variables: {}
                 };
-                return L.circleMarker(latlng, style_Cities_1_0(feature));
+                return L.circleMarker(latlng, style_Cities_2_0(feature));
             },
         });
-        bounds_group.addLayer(layer_Cities_1);
-        map.addLayer(layer_Cities_1);
+        bounds_group.addLayer(layer_Cities_2);
+        map.addLayer(layer_Cities_2);
         const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
         "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
         var photonControl = L.control.photon({
@@ -437,8 +448,9 @@
             }
         });
         var overlaysTree = [
-            {label: '<img src="legend/Cities_1.png" /> Cities', layer: layer_Cities_1},
-            {label: 'SRKW Sightings (1999-2022)<br /><table><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_00.png" /></td><td>0</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_1501.png" /></td><td>1 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_512002.png" /></td><td>51 - 200</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_2015003.png" /></td><td>201 - 500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_50110004.png" /></td><td>501 - 1000</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_100125005.png" /></td><td>1001 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_0_250149646.png" /></td><td>2501 - 4964</td></tr></table>', layer: layer_SRKWSightings19992022_0},]
+            {label: '<img src="legend/Cities_2.png" /> Cities', layer: layer_Cities_2},
+            {label: 'SRKW Sightings (1999-2022)<br /><table><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_00.png" /></td><td>0</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_1501.png" /></td><td>1 - 50</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_512002.png" /></td><td>51 - 200</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_2015003.png" /></td><td>201 - 500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_50110004.png" /></td><td>501 - 1000</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_100125005.png" /></td><td>1001 - 2500</td></tr><tr><td style="text-align: center;"><img src="legend/SRKWSightings19992022_1_250149646.png" /></td><td>2501 - 4964</td></tr></table>', layer: layer_SRKWSightings19992022_1},
+            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0},]
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
             //selectorBack: false,
@@ -501,37 +513,27 @@
         });       
         setBounds();
         var i = 0;
-        layer_Cities_1.eachLayer(function(layer) {
+        layer_Cities_2.eachLayer(function(layer) {
             var context = {
                 feature: layer.feature,
                 variables: {}
             };
-            layer.bindTooltip((layer.feature.properties['NAME'] !== null?String('<div style="color: #323232; font-size: 8pt; font-family: \'Georgia\', sans-serif;">' + layer.feature.properties['NAME']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Cities_1'});
+            layer.bindTooltip((layer.feature.properties['NAME'] !== null?String('<div style="color: #323232; font-size: 8pt; font-family: \'Georgia\', sans-serif;">' + layer.feature.properties['NAME']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Cities_2'});
             labels.push(layer);
             totalMarkers += 1;
               layer.added = true;
               addLabel(layer, i);
               i++;
         });
-        map.addControl(new L.Control.Search({
-            layer: layer_SRKWSightings19992022_0,
-            initial: false,
-            hideMarkerOnCollapse: true,
-            propertyName: 'TOTAL'}));
-        if (typeof url === 'undefined') {
-            document.getElementsByClassName('search-button')[0].className += ' fa fa-binoculars';
-        } else {
-            document.getElementsByClassName('search-button')[1].className += ' fa fa-binoculars';
-        }
-        resetLabels([layer_Cities_1]);
+        resetLabels([layer_Cities_2]);
         map.on("zoomend", function(){
-            resetLabels([layer_Cities_1]);
+            resetLabels([layer_Cities_2]);
         });
         map.on("layeradd", function(){
-            resetLabels([layer_Cities_1]);
+            resetLabels([layer_Cities_2]);
         });
         map.on("layerremove", function(){
-            resetLabels([layer_Cities_1]);
+            resetLabels([layer_Cities_2]);
         });
         </script>        
     </body>
